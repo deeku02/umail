@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.urls import path
+from sendmail import views
+
 
 urlpatterns = [
-    path('login/',view='login'),
+    path("login/", views.login, name="login"),
+    path("register/", views.register, name="register"),
 ]

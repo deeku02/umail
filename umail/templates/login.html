@@ -1,18 +1,20 @@
+{% load static %}
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>U-mail Login</title>
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
   <div class="container">
     <div class="left-section">
       <h1>Sign in to <br> U-mail....</h1>
-      <p>If you don’t have an account register <a href="./register.html">here!</a></p>
+      <p>If you don’t have an account register <a href="{% url 'register' %}">here!</a></p>
       <div class="illustration">
-        <img src="./saly-14-55.png" alt="3D Character">
+        <img src="{% static 'logo.png' %}" alt="3D Character">
       </div>
     </div>
     <div class="right-section">
