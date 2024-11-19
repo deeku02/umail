@@ -1,0 +1,141 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .container {
+    display: flex;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 80%;
+    max-width: 900px;
+  }
+  
+  .left-section, .right-section {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .left-section {
+    background-color: #f8f9fc;
+    justify-content: space-between;
+  }
+  
+  .left-section h1 {
+    font-size: 2rem;
+    color: #333;
+  }
+  
+  .left-section p {
+    margin-top: 20px;
+    color: #666;
+  }
+  
+  .left-section a {
+    color: #5a5cf4;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  .left-section a:hover {
+    text-decoration: underline;
+  }
+  
+  .illustration {
+    text-align: center;
+  }
+  
+  .illustration img {
+    width: 150px;
+  }
+  
+  /* Right Section Forms */
+  form {
+    margin: auto;
+    width: 100%;
+    max-width: 350px;
+    text-align: center;
+  }
+  
+  form h2 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: #333;
+  }
+  
+  form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  form input:focus {
+    border-color: #5a5cf4;
+    outline: none;
+  }
+  
+  form a {
+    font-size: 0.9rem;
+    color: #5a5cf4;
+    text-decoration: none;
+  }
+  
+  form a:hover {
+    text-decoration: underline;
+  }
+  
+  form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #5a5cf4;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  form button:hover {
+    background-color: #494ece;
+  }
+  
+  /* Responsive Design for Mobile */
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+      width: 90%;
+      height: auto;
+    }
+  
+    .left-section {
+      display: none; /* Hide the left section on mobile */
+    }
+  
+    .right-section {
+      padding: 20px;
+    }
+  
+    form {
+      width: 100%;
+      max-width: none;
+    }
+  
+    form input {
+      margin-bottom: 15px; /* Adjust spacing for better readability */
+    }
+  }
+  
