@@ -1,31 +1,43 @@
 {% load static %}
 <!DOCTYPE html>
-
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>U-mail Login</title>
-  <link rel="stylesheet" href="{% static 'style.css' %}">
-</head>
-<body>
-  <div class="container">
-    <div class="left-section">
-      <h1>Sign in to <br> U-mail....</h1>
-      <p>If you don’t have an account register <a href="{% url 'register' %}">here!</a></p>
-      <div class="illustration">
-        <img src="{% static 'logo.png' %}" alt="3D Character">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>U-mail Login</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="left-section">
+        <h1>
+          Sign in to <br />
+          U-mail....
+        </h1>
+        <p>
+          If you don’t have an account register
+          <a href="{% url 'register' %}">here!</a>
+        </p>
+        <div class="illustration">
+          <img src="{% static 'logo.png' %}" alt="3D Character" />
+        </div>
+      </div>
+      <div class="right-section">
+        <form class="login-form" method="post">
+          {% csrf_token %}
+          <h2>Sign in</h2>
+          {{ form.username }} {{ form.password }}
+          <a href="#" class="forgot-password">Forgot password?</a>
+          <button type="submit">Login</button>
+        </form>
+        {% if messages %}
+        <ul>
+          {% for message in messages %}
+          <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
       </div>
     </div>
-    <div class="right-section">
-      <form class="login-form">
-        <h2>Sign in</h2>
-        <input type="text" placeholder="Enter email or user name" required>
-        <input type="password" placeholder="Password" required>
-        <a href="#" class="forgot-password">Forgot password?</a>
-        <button type="submit">Login</button>
-      </form>
-    </div>
-  </div>
-</body>
+  </body>
 </html>
