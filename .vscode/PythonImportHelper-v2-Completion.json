@@ -16,6 +16,14 @@
         "documentation": {}
     },
     {
+        "label": "messages",
+        "importPath": "django.contrib",
+        "description": "django.contrib",
+        "isExtraImport": true,
+        "detail": "django.contrib",
+        "documentation": {}
+    },
+    {
         "label": "admin",
         "importPath": "django.contrib",
         "description": "django.contrib",
@@ -29,6 +37,30 @@
         "description": "django.apps",
         "isExtraImport": true,
         "detail": "django.apps",
+        "documentation": {}
+    },
+    {
+        "label": "ModelForm",
+        "importPath": "django.forms",
+        "description": "django.forms",
+        "isExtraImport": true,
+        "detail": "django.forms",
+        "documentation": {}
+    },
+    {
+        "label": "forms",
+        "importPath": "django",
+        "description": "django",
+        "isExtraImport": true,
+        "detail": "django",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "django.contrib.auth.models",
+        "description": "django.contrib.auth.models",
+        "isExtraImport": true,
+        "detail": "django.contrib.auth.models",
         "documentation": {}
     },
     {
@@ -97,6 +129,30 @@
         "documentation": {}
     },
     {
+        "label": "redirect",
+        "importPath": "django.shortcuts",
+        "description": "django.shortcuts",
+        "isExtraImport": true,
+        "detail": "django.shortcuts",
+        "documentation": {}
+    },
+    {
+        "label": "authenticate",
+        "importPath": "django.contrib.auth",
+        "description": "django.contrib.auth",
+        "isExtraImport": true,
+        "detail": "django.contrib.auth",
+        "documentation": {}
+    },
+    {
+        "label": "login",
+        "importPath": "django.contrib.auth",
+        "description": "django.contrib.auth",
+        "isExtraImport": true,
+        "detail": "django.contrib.auth",
+        "documentation": {}
+    },
+    {
         "label": "os",
         "kind": 6,
         "isExtraImport": true,
@@ -156,20 +212,38 @@
         "documentation": {}
     },
     {
+        "label": "UserRegistrationForm",
+        "kind": 6,
+        "importPath": "umail.sendmail.forms",
+        "description": "umail.sendmail.forms",
+        "peekOfCode": "class UserRegistrationForm(ModelForm):\n    class Meta:\n        model=User\n        fields=('username','email','password')\nclass LoginForm(forms.Form):\n    username = forms.CharField(\n        max_length=150,\n        widget=forms.TextInput(attrs={'placeholder': 'Enter email or username'}),\n    )\n    password = forms.CharField(",
+        "detail": "umail.sendmail.forms",
+        "documentation": {}
+    },
+    {
+        "label": "LoginForm",
+        "kind": 6,
+        "importPath": "umail.sendmail.forms",
+        "description": "umail.sendmail.forms",
+        "peekOfCode": "class LoginForm(forms.Form):\n    username = forms.CharField(\n        max_length=150,\n        widget=forms.TextInput(attrs={'placeholder': 'Enter email or username'}),\n    )\n    password = forms.CharField(\n        widget=forms.PasswordInput(attrs={'placeholder': 'Password'}),\n    )",
+        "detail": "umail.sendmail.forms",
+        "documentation": {}
+    },
+    {
         "label": "urlpatterns",
         "kind": 5,
         "importPath": "umail.sendmail.urls",
         "description": "umail.sendmail.urls",
-        "peekOfCode": "urlpatterns = [\n    path(\"login/\", views.login, name=\"login\"),\n    path(\"register/\", views.register, name=\"register\"),\n]",
+        "peekOfCode": "urlpatterns = [\n    path('dash/',views.dashboard_view,name='dashboard'),\n    path(\"login/\", views.login_view, name=\"login\"),\n    path(\"register/\", views.register, name=\"register\"),\n]",
         "detail": "umail.sendmail.urls",
         "documentation": {}
     },
     {
-        "label": "login",
+        "label": "login_view",
         "kind": 2,
         "importPath": "umail.sendmail.views",
         "description": "umail.sendmail.views",
-        "peekOfCode": "def login(request):\n    return render(request, \"login.html\")\ndef register(request):\n    return render(request, \"register.html\")",
+        "peekOfCode": "def login_view(request):\n    if request.method == \"POST\":\n        form = LoginForm(\n            request.POST\n        )  # Replace LoginForm with AuthenticationForm if using it\n        if form.is_valid():\n            username = form.cleaned_data[\"username\"]\n            password = form.cleaned_data[\"password\"]\n            user = authenticate(request, username=username, password=password)\n            if user is not None:",
         "detail": "umail.sendmail.views",
         "documentation": {}
     },
@@ -178,7 +252,16 @@
         "kind": 2,
         "importPath": "umail.sendmail.views",
         "description": "umail.sendmail.views",
-        "peekOfCode": "def register(request):\n    return render(request, \"register.html\")",
+        "peekOfCode": "def register(request):\n    if request.method == \"POST\":\n        form = UserRegistrationForm(request.POST)\n        if form.is_valid():\n            form.save()\n            return redirect(\"login\")\n    else:\n        form = UserRegistrationForm()\n    return render(request, \"register.html\", {\"form\": form})\ndef dashboard_view(request):",
+        "detail": "umail.sendmail.views",
+        "documentation": {}
+    },
+    {
+        "label": "dashboard_view",
+        "kind": 2,
+        "importPath": "umail.sendmail.views",
+        "description": "umail.sendmail.views",
+        "peekOfCode": "def dashboard_view(request):\n    return render(request, \"dashboard.html\", {})",
         "detail": "umail.sendmail.views",
         "documentation": {}
     },

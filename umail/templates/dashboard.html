@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-purple-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-1/6 bg-white h-full shadow-md flex flex-col justify-between">
+            <div>
+                <div class="text-xl font-bold p-6 flex items-center gap-2">
+                    <img src="{% static 'umail.png' %}" alt="U Mail Icon" class="w-6 h-6"> <!-- Replace path_to_your_icon/umail_icon.png with the actual path -->
+                    U Mail
+                </div>
+                <nav class="mt-6">
+                    <ul>
+                        <li class="p-4 hover:bg-purple-100 cursor-pointer flex items-center gap-2">
+                            <span class="material-icons">dashboard</span>
+                            <span>Dashboard</span>
+                        </li>
+                        <li class="p-4 hover:bg-purple-100 cursor-pointer flex items-center gap-2">
+                            <span class="material-icons">bar_chart</span>
+                            <span>Reports</span>
+                        </li>
+                        <li class="p-4 hover:bg-purple-100 cursor-pointer flex items-center gap-2">
+                            <span class="material-icons">settings</span>
+                            <span>Settings</span>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="p-6">
+                <img src="https://via.placeholder.com/50" alt="Profile" class="w-12 h-12 rounded-full">
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 overflow-auto">
+            <header class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold">Dashboard</h1>
+                <div class="text-sm font-semibold">Feb 2023</div>
+            </header>
+
+            <!-- Upload Section and Prompt -->
+            <div class="flex items-center gap-6 mb-6">
+                <div class="bg-white shadow-md p-6 rounded-lg flex items-center justify-center">
+                    <button class="bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 focus:outline-none">
+                        Upload CSV/Google Sheets
+                    </button>
+                </div>
+
+                <!-- Prompt Section -->
+                <div class="flex-1 flex flex-col">
+                    <div id="outputBox" class="flex-1 bg-white border border-gray-300 rounded-lg p-4 mb-4 overflow-auto" style="height: 150px;"></div>
+                    <textarea id="promptInput" class="h-12 border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Write your prompt here..."></textarea>
+                </div>
+
+                <!-- Stats in Column -->
+                <div class="flex flex-col gap-4">
+                    <div class="bg-white shadow-md p-4 rounded-lg text-center">
+                        <p class="text-2xl font-bold">120</p>
+                        <p class="text-gray-600">Sent</p>
+                    </div>
+                    <div class="bg-white shadow-md p-4 rounded-lg text-center">
+                        <p class="text-2xl font-bold">56</p>
+                        <p class="text-gray-600">Scheduled</p>
+                    </div>
+                    <div class="bg-white shadow-md p-4 rounded-lg text-center">
+                        <p class="text-2xl font-bold">30</p>
+                        <p class="text-gray-600">Pending</p>
+                    </div>
+                    <div class="bg-white shadow-md p-4 rounded-lg text-center">
+                        <p class="text-2xl font-bold">10</p>
+                        <p class="text-gray-600">Failed</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphs and Analytics -->
+            <div class="grid grid-cols-2 gap-6 mt-6">
+                <div class="bg-white shadow-md p-4 rounded-lg">
+                    <h2 class="text-md font-semibold mb-2">Reports</h2>
+                    <div class="relative" style="height: 200px; overflow:hidden;">
+                        <canvas id="reportChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white shadow-md p-4 rounded-lg">
+                    <h2 class="text-md font-semibold mb-2">Analytics</h2>
+                    <div class="relative" style="height: 200px; overflow:hidden;">
+                        <canvas id="analyticsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Example scripts for placeholders, you can replace with actual chart libraries (like Chart.js)
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx1 = document.getElementById('reportChart').getContext('2d');
+            const ctx2 = document.getElementById('analyticsChart').getContext('2d');
+            new Chart(ctx1, { type: 'line', data: { labels: ['10am', '11am', '12am'], datasets: [{ label: 'Sent', data: [30, 60, 20] }] } });
+            new Chart(ctx2, { type: 'doughnut', data: { labels: ['Delivered', 'Opened', 'Bounced'], datasets: [{ data: [50, 30, 20] }] } });
+        });
+
+        // Handle prompt input
+        const promptInput = document.getElementById('promptInput');
+        const outputBox = document.getElementById('outputBox');
+
+        promptInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const promptText = promptInput.value.trim();
+                if (promptText) {
+                    outputBox.textContent = promptText;
+                    promptInput.value = '';
+                }
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</body>
+</html>
