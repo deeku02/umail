@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect
 from .forms import UserRegistrationForm, LoginForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
+import csv
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 
 # Create your views here.
@@ -39,3 +42,33 @@ def register(request):
 
 def dashboard_view(request):
     return render(request, "dashboard.html", {})
+
+@csrf_exempt
+def process_csv_file(request):
+    if request.method=='POST' and request.FILES.get('file'):
+        upload_file=request.FILES['file']
+        email_list=[]
+
+        try:
+            decoded_file=upload_file.read().decode("utf-8").splitlines()
+            csv_reader=csv.DictReader(decoded_file)
+
+            for row in csv_reader:
+                email=row.get("email")
+                if email:
+                    email_list.append(email)
+
+            return JsonResponse({
+            "message": "CSV file processed successfully!",
+                "emails": email_list,
+                "email_count": len(email_list),
+                })
+        except Exception as e:
+            return JsonResponse({"error":str(e)},status=400)
+    return JsonResponse({"error":"InvalidRequest"},status=400)
+
+def analytics(request):
+    return render(request,"analytics.html",{})
+
+def settings(request):
+    return render(request,'settings.html',{})

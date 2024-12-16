@@ -4,7 +4,10 @@ from sendmail import views
 
 
 urlpatterns = [
-    path('dash/',views.dashboard_view,name='dashboard'),
+    path("", views.dashboard_view, name="dashboard"),
     path("login/", views.login_view, name="login"),
     path("register/", views.register, name="register"),
+    path("process-csv/", views.process_csv_file, name="process_csv"),
+    path("analytics/", views.analytics, name="analytics"),
+    path('settings',views.settings,name='settings'),
 ]
