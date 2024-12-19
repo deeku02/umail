@@ -1,0 +1,206 @@
+<!-- filepath: /C:/Users/Ashish Yadav/OneDrive/Desktop/projects/umail/umail/templates/settings.html -->
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<main class="flex-1 p-6 overflow-auto">
+  <!-- Schedule Header -->
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-2xl font-bold text-gray-800">Schedule List</h1>
+    <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center">
+      Add New <span class="ml-2 text-lg">+</span>
+    </button>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="grid grid-cols-4 gap-4">
+    <!-- Left Section - Upload and Generate -->
+    <div class="col-span-1 bg-white rounded-lg shadow p-4">
+      <form id="generate-form">
+        <div class="mb-4">
+          <label class="block text-gray-700 font-semibold mb-2" for="csv-file">Upload CSV File</label>
+          <input type="file" id="csv-file" class="w-full px-3 py-2 border rounded" accept=".csv">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 font-semibold mb-2" for="date">Date</label>
+          <input type="date" id="date" class="w-full px-3 py-2 border rounded">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 font-semibold mb-2" for="time">Time</label>
+          <input type="time" id="time" class="w-full px-3 py-2 border rounded">
+        </div>
+        <!-- Generated Text Box -->
+        <div class="mb-4 bg-white p-4 rounded-lg shadow">
+          <h2 class="text-xl font-bold text-gray-800 mb-2">Generated Text</h2>
+          <div id="output-box" class="p-4 border rounded bg-gray-100 text-gray-700 cursor-pointer"></div>
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 font-semibold mb-2" for="prompt">Prompt</label>
+          <textarea id="prompt" class="w-full px-3 py-2 border rounded"></textarea>
+        </div>
+        <button type="button" id="generate-button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Generate</button>
+        <button type="button" id="send-button" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mt-2 hidden">Send</button>
+      </form>
+    </div>
+
+    <!-- Right Section - Schedule List -->
+    <div class="col-span-3 space-y-4 overflow-auto h-full">
+      {% for schedule in schedules %}
+      <div class="flex items-center justify-between bg-white p-4 rounded-lg shadow">
+        <!-- Recipient Email with Circle -->
+        <div class="flex items-center">
+          <div class="w-8 h-8 rounded-full text-white flex items-center justify-center" style="background-color: {{ schedule.recipient_email|random_color }};">
+            {{ schedule.recipient_email|slice:":1"|upper }}
+          </div>
+          <span class="ml-2">{{ schedule.recipient_email }}</span>
+        </div>
+        <!-- Date and Time Row -->
+        <div class="flex space-x-6 items-center">
+          <input type="checkbox" class="h-5 w-5 text-blue-500" />
+          <div class="flex items-center space-x-4 text-gray-700 font-semibold">
+            <span><i class="fas fa-calendar-alt text-blue-500"></i> {{ schedule.date }}</span>
+            <span><i class="fas fa-clock text-blue-500"></i> {{ schedule.time }}</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Dialog Box -->
+  <div id="dialog-box" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+      <h3 class="text-xl font-bold mb-4">Generated Text</h3>
+      <div id="dialog-content" class="mb-4"></div>
+      <button id="close-dialog" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Close</button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("csv-file").addEventListener("change", function () {
+      document.getElementById("send-button").classList.remove("hidden");
+    });
+
+    document.getElementById("generate-button").addEventListener("click", function () {
+      const csvFile = document.getElementById("csv-file").files[0];
+      const date = document.getElementById("date").value;
+      const time = document.getElementById("time").value;
+      const prompt = document.getElementById("prompt").value;
+
+      // Create form data
+      const formData = new FormData();
+      formData.append("csv_file", csvFile);
+      formData.append("date", date);
+      formData.append("time", time);
+      formData.append("prompt", prompt);
+
+      // Send request to the endpoint
+      fetch("/generate-text/", {
+        method: "POST",
+        body: formData,
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        const generatedText = data.generated_text;
+        const truncatedText = generatedText.length > 100 ? generatedText.substring(0, 100) + '...' : generatedText;
+        document.getElementById("output-box").innerText = truncatedText;
+        document.getElementById("output-box").dataset.fullText = generatedText;
+      })
+      .catch((error) => console.error("Error:", error));
+    });
+
+    document.getElementById("prompt").addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const promptText = e.target.value.trim();
+        if (promptText) {
+          document.getElementById("output-box").textContent = "Generating response...";
+
+          fetch("/generate-text/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": getCSRFToken(),
+            },
+            body: JSON.stringify({ prompt: promptText }),
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            const generatedText = data.generated_text;
+            const truncatedText = generatedText.length > 100 ? generatedText.substring(0, 100) + '...' : generatedText;
+            document.getElementById("output-box").textContent = truncatedText;
+            document.getElementById("output-box").dataset.fullText = generatedText;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            document.getElementById("output-box").textContent = "Failed to generate response";
+          });
+          e.target.value = "";
+        }
+      }
+    });
+
+    document.getElementById("send-button").addEventListener("click", function () {
+      const csvFile = document.getElementById("csv-file").files[0];
+      const date = document.getElementById("date").value;
+      const time = document.getElementById("time").value;
+      const generatedText = document.getElementById("output-box").dataset.fullText;
+
+      if (!csvFile || !date || !time || !generatedText) {
+        alert("Please make sure all fields are filled and text is generated.");
+        return;
+      }
+
+      // Combine date and time into a single datetime string
+      const scheduledTime = `${date}T${time}`;
+
+      // Create form data
+      const formData = new FormData();
+      formData.append("file", csvFile);
+      formData.append("scheduled_time", scheduledTime);
+      formData.append("message", generatedText);
+      formData.append("is_scheduled", "true");
+
+      // Send request to the endpoint
+      fetch("/process-csv/", {
+        method: "POST",
+        headers: { "X-CSRFToken": getCSRFToken() },
+        body: formData,
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          alert("Emails scheduled successfully.");
+        } else {
+          alert("Error: " + data.error);
+        }
+      })
+      .catch(() => alert("Error processing file or sending emails."));
+    });
+
+    document.getElementById("output-box").addEventListener("click", function () {
+      const fullText = document.getElementById("output-box").dataset.fullText;
+      document.getElementById("dialog-content").innerText = fullText;
+      document.getElementById("dialog-box").classList.remove("hidden");
+    });
+
+    document.getElementById("close-dialog").addEventListener("click", function () {
+      document.getElementById("dialog-box").classList.add("hidden");
+    });
+
+    function getCSRFToken() {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, 10) === "csrftoken=") {
+            cookieValue = decodeURIComponent(cookie.substring(10));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+  </script>
+{% endblock %}

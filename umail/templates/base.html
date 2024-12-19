@@ -6,12 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+      .sticky {
+        position: -webkit-sticky; /* For Safari */
+        position: sticky;
+        top: 0;
+      }
+    </style>
   </head>
   <body class="bg-purple-100 font-sans">
     <div class="flex h-screen">
       <!-- Sidebar -->
       <aside
-        class="w-1/6 bg-white h-full shadow-md flex flex-col justify-between"
+        class="w-1/6 bg-white h-full shadow-md flex flex-col justify-between sticky top-0"
       >
         <div>
           <div class="text-xl font-bold p-6 flex items-center gap-2">
@@ -39,8 +46,8 @@
               <li
                 class="p-4 hover:bg-purple-100 cursor-pointer flex items-center gap-2"
               >
-                <span class="material-icons">settings</span>
-                <span><a href="{% url 'settings' %}">Settings</a></span>
+                <span class="material-icons">schedule</span>
+                <span><a href="{% url 'settings' %}">Schedule</a></span>
               </li>
             </ul>
           </nav>
@@ -56,5 +63,13 @@
 
       {% block content %} {% endblock content %}
     </div>
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
   </body>
 </html>

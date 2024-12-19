@@ -1,7 +1,8 @@
+<!-- filepath: /C:/Users/Ashish Yadav/OneDrive/Desktop/projects/umail/umail/templates/dashboard.html -->
 {% extends "base.html" %}
 
 {% block content %}
-    <main class="flex-1 p-6 overflow-auto">
+<main class="flex-1 p-6 overflow-auto">
   <header class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold">Dashboard</h1>
     <div class="text-sm font-semibold">Feb 2023</div>
@@ -43,19 +44,19 @@
     <!-- Stats Column -->
     <div class="flex flex-col gap-4">
       <div class="bg-white shadow-md p-4 rounded-lg text-center">
-        <p class="text-2xl font-bold">120</p>
+        <p class="text-2xl font-bold">{{ sent_emails_count }}</p>
         <p class="text-gray-600">Sent</p>
       </div>
       <div class="bg-white shadow-md p-4 rounded-lg text-center">
-        <p class="text-2xl font-bold">56</p>
+        <p class="text-2xl font-bold">{{ scheduled_emails_count }}</p>
         <p class="text-gray-600">Scheduled</p>
       </div>
       <div class="bg-white shadow-md p-4 rounded-lg text-center">
-        <p class="text-2xl font-bold">30</p>
+        <p class="text-2xl font-bold">0</p>
         <p class="text-gray-600">Pending</p>
       </div>
       <div class="bg-white shadow-md p-4 rounded-lg text-center">
-        <p class="text-2xl font-bold">10</p>
+        <p class="text-2xl font-bold">{{ failed_events_count }}</p>
         <p class="text-gray-600">Failed</p>
       </div>
     </div>
@@ -80,6 +81,40 @@
     const csvFileInput = document.getElementById("csvFileInput");
     const fileNameDisplay = document.getElementById("fileNameDisplay");
     const sendEmailButton = document.getElementById("sendEmailButton");
+    const promptInput = document.getElementById("promptInput");
+    const outputBox = document.getElementById("outputBox");
+
+    promptInput.addEventListener("keypress", (e) => {
+      if (e.key == "Enter") {
+        e.preventDefault();
+        const promptText = promptInput.value.trim();
+        if (promptText) {
+          outputBox.textContent = "Generating response... ";
+
+          fetch("/generate-text/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": getCSRFToken(),
+            },
+            body: JSON.stringify({ prompt: promptText }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.generated_text) {
+                outputBox.textContent = data.generated_text;
+              } else {
+                outputBox.textContent = "Error: " + data.error;
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              outputBox.textContent = "Failed to generate response";
+            });
+          promptInput.value = "";
+        }
+      }
+    });
 
     uploadButton.addEventListener("click", () => csvFileInput.click());
 
@@ -99,6 +134,13 @@
     sendEmailButton.addEventListener("click", () => {
       const formData = new FormData();
       formData.append("file", csvFileInput.files[0]);
+      const outputMessage = outputBox.textContent.trim();
+
+      if (!outputMessage) {
+        alert("Please generate a message in the Output Box before sending emails.");
+        return;
+      }
+      formData.append("message", outputMessage); // Add message to formData
 
       fetch("/process-csv/", {
         method: "POST",
@@ -106,8 +148,14 @@
         body: formData,
       })
         .then((response) => response.json())
-        .then((data) => alert(data.message || "File processed successfully!"))
-        .catch(() => alert("Error processing file."));
+        .then((data) => {
+          if (data.success) {
+            alert("Emails sent successfully!");
+          } else {
+            alert("Error: " + data.error);
+          }
+        })
+        .catch(() => alert("Error processing file or sending emails."));
     });
 
     // Retrieve CSRF Token
@@ -123,28 +171,75 @@
     // Chart Examples
     const ctx1 = document.getElementById("reportChart")?.getContext("2d");
     const ctx2 = document.getElementById("analyticsChart")?.getContext("2d");
-    if (ctx1)
+
+    if (ctx1) {
       new Chart(ctx1, {
         type: "line",
         data: {
-          labels: ["10am", "11am", "12am"],
-          datasets: [{ data: [30, 60, 20] }],
+          labels: ["Sent Emails", "Scheduled Emails", "Failed Events"],
+          datasets: [{
+            label: 'Email Statistics',
+            data: [{{ sent_emails_count }}, {{ scheduled_emails_count }}, {{ failed_events_count }}],
+            backgroundColor: [
+              'rgba(75, 192, 192, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(255, 99, 132, 0.2)'
+            ],
+            borderColor: [
+              'rgba(75, 192, 192, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+          }]
         },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
       });
-    if (ctx2)
+    }
+
+    if (ctx2) {
       new Chart(ctx2, {
         type: "doughnut",
         data: {
-          labels: ["Delivered", "Opened", "Bounced"],
-          datasets: [{ data: [50, 30, 20] }],
+          labels: ["Sent Emails", "Scheduled Emails", "Failed Events"],
+          datasets: [{
+            label: 'Email Statistics',
+            data: [{{ sent_emails_count }}, {{ scheduled_emails_count }}, {{ failed_events_count }}],
+            backgroundColor: [
+              'rgba(85, 192, 75, 0.2)',
+              'rgba(54, 162, 235, 0.2)',
+              'rgba(255, 99, 132, 0.2)'
+            ],
+            borderColor: [
+              'rgb(85, 192, 75)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+          }]
         },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Email Statistics'
+            }
+          }
+        }
       });
+    }
   });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link
-  href="https://fonts.googleapis.com/icon?family=Material+Icons"
-  rel="stylesheet"
-/>
-{% endblock content %}
 
+{% endblock content %}
